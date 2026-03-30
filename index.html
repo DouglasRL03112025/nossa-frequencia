@@ -3,238 +3,293 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nossa Frequência | Experiência a Dois</title>
+    <title>Nossa Frequência | Ritual de Conexão</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-fase1: linear-gradient(135deg, #1e3a2f 0%, #0d1a14 100%);
-            --bg-fase2: linear-gradient(135deg, #3a2f1e 0%, #1a140d 100%);
-            --bg-fase3: linear-gradient(135deg, #3a1e1e 0%, #1a0d0d 100%);
-            --accent: #ff4081;
-            --glass: rgba(255, 255, 255, 0.07);
+            --accent: #ff7597;
+            --text-main: #ffffff;
+            --glass: rgba(255, 255, 255, 0.08);
+            /* Cores das Fases */
+            --fase1: linear-gradient(135deg, #1a2a24 0%, #0d1412 100%);
+            --fase2: linear-gradient(135deg, #2a1f14 0%, #14100d 100%);
+            --fase3: linear-gradient(135deg, #2a1414 0%, #140d0d 100%);
         }
 
-        * { box-sizing: border-box; transition: all 0.8s ease; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             margin: 0;
             padding: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-fase1);
-            color: white;
+            font-family: 'Poppins', sans-serif;
+            background: var(--fase1);
+            color: var(--text-main);
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             overflow: hidden;
+            transition: background 1.5s ease;
         }
 
-        /* Container Principal com Efeito Glassmorphism */
-        #app-container {
-            width: 90%;
-            max-width: 450px;
-            background: var(--glass);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 30px;
-            padding: 40px 30px;
-            text-align: center;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        /* Fundo Animado Sutil */
+        body::before {
+            content: "";
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,117,151,0.05) 0%, transparent 50%);
+            animation: move 20s infinite alternate;
+            z-index: 0;
+        }
+
+        @keyframes move {
+            from { transform: translate(-20%, -20%); }
+            to { transform: translate(10%, 10%); }
+        }
+
+        #app-card {
             position: relative;
-            z-index: 2;
+            z-index: 10;
+            width: 90%;
+            max-width: 420px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 32px;
+            padding: 40px 25px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            transition: transform 0.4s ease;
+        }
+
+        .header-meta {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-weight: 600;
         }
 
         h1 {
-            font-family: 'Dancing Script', cursive;
-            font-size: 2.5rem;
-            margin: 0 0 10px 0;
-            color: var(--accent);
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin: 0 0 20px 0;
+            line-height: 1.2;
         }
 
-        .turn-indicator {
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            color: #aaa;
-            font-weight: 700;
-        }
-
-        #text {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin: 20px 0;
-            min-height: 120px;
-            font-weight: 300;
+        #content-area {
+            min-height: 180px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
             justify-content: center;
+            transition: opacity 0.5s ease, transform 0.5s ease;
         }
 
-        .reward-box {
-            background: rgba(255, 64, 129, 0.15);
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 0.95rem;
-            margin-top: 20px;
-            border-left: 4px solid var(--accent);
-            opacity: 0;
-            transform: translateY(10px);
+        .question-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            font-weight: 300;
+            margin-bottom: 25px;
         }
 
-        .reward-box.visible {
-            opacity: 1;
-            transform: translateY(0);
+        .reward-tag {
+            display: inline-block;
+            background: rgba(255, 117, 151, 0.15);
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--accent);
+            border: 1px solid rgba(255, 117, 151, 0.3);
+            font-style: italic;
+        }
+
+        .controls {
+            margin-top: 30px;
         }
 
         button {
-            background: white;
-            color: #1a1a1a;
+            background: #ffffff;
+            color: #000;
             border: none;
-            padding: 16px 40px;
+            padding: 18px 45px;
             font-size: 1rem;
-            font-weight: 700;
-            border-radius: 50px;
+            font-weight: 600;
+            border-radius: 100px;
             cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        button:active { transform: scale(0.95); }
+
+        .progress-container {
             margin-top: 30px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.4);
         }
 
-        button:hover {
-            transform: scale(1.05);
-            background: var(--accent);
-            color: white;
+        .dot-progress {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 10px;
         }
 
-        .progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background: var(--accent);
-            width: 0%;
-            border-radius: 0 0 0 30px;
+        .dot {
+            width: 6px;
+            height: 6px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
         }
 
-        /* Áudio Control */
-        #audio-controls {
+        .dot.active { background: var(--accent); width: 15px; border-radius: 10px; }
+
+        /* Audio Player Estilo */
+        #music-toggle {
             position: fixed;
-            bottom: 20px;
+            top: 20px;
             right: 20px;
+            z-index: 100;
+            background: var(--glass);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 50%;
             cursor: pointer;
-            opacity: 0.5;
         }
+
+        .fade-out { opacity: 0; transform: translateY(-10px); }
+        .fade-in { opacity: 1; transform: translateY(0); }
+
     </style>
 </head>
 <body>
 
-    <audio id="bgMusic" loop>
+    <audio id="bg-music" loop>
         <source src="https://www.chosic.com/wp-content/uploads/2021/04/Rain-and-Flowers-chosic.com_.mp3" type="audio/mpeg">
     </audio>
 
-    <div id="app-container">
-        <div id="game-content">
-            <div class="turn-indicator" id="turn">Sincronização</div>
+    <div id="music-toggle" onclick="toggleMusic()">🔇</div>
+
+    <div id="app-card">
+        <div id="game-ui">
+            <div class="header-meta" id="turn-label">O Ritual</div>
             <h1 id="title">Nossa Frequência</h1>
-            <p id="text">Este é um espaço seguro para nós dois. <br> Esqueçam o mundo lá fora por 25 minutos. <br><br> Vamos começar?</p>
             
-            <div id="reward" class="reward-box">
-                </div>
+            <div id="content-area">
+                <p class="question-text" id="main-text">
+                    Preparem um ambiente calmo, deixem os telemóveis longe e olhem um para o outro. <br><br>
+                    Este tempo é um presente para o vosso amor.
+                </p>
+                <div id="reward-area"></div>
+            </div>
 
-            <button id="mainBtn" onclick="nextStep()">Iniciar Ritual</button>
+            <div class="controls">
+                <button id="next-btn" onclick="handleNext()">Começar Experiência</button>
+            </div>
+
+            <div class="progress-container">
+                <span id="step-label">Prontos para sintonizar?</span>
+                <div class="dot-progress" id="dots"></div>
+            </div>
         </div>
-        <div class="progress-bar" id="progress"></div>
     </div>
 
-    <div id="audio-controls" onclick="toggleMusic()">
-        🎵 <span id="musicStatus">OFF</span>
-    </div>
-
-<script>
-    const steps = [
-        { fase: 1, turn: "Vez Dele", txt: "Qual foi o primeiro 'mico' ou coisa engraçada que aconteceu no início do nosso namoro?", rew: "🎁 Recompensa: Você ganhou um doce! Saboreie lentamente." },
-        { fase: 1, turn: "Vez Dela", txt: "Se pudéssemos repetir um único encontro que tivemos, qual seria e por quê?", rew: "🎁 Recompensa: Ganhaste um doce! Escolha o preferido dele(a) para ele(a) comer." },
-        { fase: 1, turn: "Os Dois", txt: "Qual mania minha que, apesar de irritante, você hoje acha que é 'a minha cara'?", rew: "🎁 Recompensa: Um sorriso sincero e um doce compartilhado." },
-        
-        { fase: 2, turn: "Vez Dele", txt: "Qual característica minha você admira e sente que eu raramente sou elogiado(a) por ela?", rew: "🎁 Recompensa: Um abraço apertado de 20 segundos agora." },
-        { fase: 2, turn: "Os Dois", txt: "Fiquem em silêncio, olhando nos olhos um do outro por 30 segundos...", rew: "🎁 Recompensa: Façam carinho no rosto um do outro enquanto respiram fundo." },
-        { fase: 2, turn: "Vez Dela", txt: "Qual momento desta última semana fez você se sentir verdadeiramente amada por mim?", rew: "🎁 Recompensa: Um beijo carinhoso na testa ou na mão." },
-        
-        { fase: 3, turn: "Vez Dele", txt: "Sussurre no ouvido dela algo que você quer muito fazer com ela no próximo fim de semana.", rew: "🎁 Recompensa: Um beijo de verdade, sem pressa de acabar." },
-        { fase: 3, turn: "Vez Dela", txt: "Faça uma massagem relaxante nos ombros ou pés dele por 2 minutos.", rew: "🎁 Recompensa: Deixe o peso do seu corpo relaxar no dele." },
-        { fase: 3, turn: "Os Dois", txt: "O que eu posso fazer na próxima semana para que você se sinta mais amado(a) e menos sobrecarregado(a)?", rew: "🎁 Recompensa: Um abraço final onde os corações se encostam." }
-    ];
-
-    let current = -1;
-    const music = document.getElementById('bgMusic');
-
-    function nextStep() {
-        if (current === -1) {
-            music.play();
-            document.getElementById('musicStatus').innerText = "ON";
-        }
-
-        current++;
-        const btn = document.getElementById('mainBtn');
-        const text = document.getElementById('text');
-        const reward = document.getElementById('reward');
-        const turn = document.getElementById('turn');
-        const progress = document.getElementById('progress');
-        const body = document.body;
-
-        if (current < steps.length) {
-            const data = steps[current];
+    <script>
+        const ritual = [
+            { fase: 1, turn: "Vez Dele", q: "Qual foi o primeiro 'mico' ou momento engraçado que vivemos no início de tudo?", r: "🎁 Recompensa: Você ganhou um doce! Saboreie com calma." },
+            { fase: 1, turn: "Vez Dela", q: "Se pudéssemos teletransportar agora para um encontro que já tivemos, qual escolherias?", r: "🎁 Recompensa: Escolha um doce para dar na boca dele(a)." },
+            { fase: 1, turn: "Os Dois", q: "Qual mania minha que, no fundo, você acha que nos define como casal?", r: "🎁 Recompensa: Um brinde com o vosso doce favorito." },
             
-            // Animação de saída
-            text.style.opacity = 0;
-            reward.classList.remove('visible');
+            { fase: 2, turn: "Vez Dele", q: "O que eu faço que te faz sentir mais seguro(a) e amado(a) ao meu lado?", r: "🎁 Recompensa: Um abraço de 20 segundos sentindo o coração do outro." },
+            { fase: 2, turn: "Ação Guiada", q: "Segurem as mãos e olhem-se nos olhos em silêncio por 30 segundos...", r: "🎁 Recompensa: Um beijo carinhoso na testa ou na mão." },
+            { fase: 2, turn: "Vez Dela", q: "Qual detalhe simples da nossa rotina você mais sentiria falta se não estivéssemos juntos?", r: "🎁 Recompensa: Faça um elogio que ele(a) não espera ouvir hoje." },
+            
+            { fase: 3, turn: "Vez Dele", q: "Sussurre no ouvido algo que você adora no corpo ou na alma dela.", r: "🎁 Recompensa: Um beijo de verdade, demorado e presente." },
+            { fase: 3, turn: "Vez Dela", q: "Faça uma massagem suave nos ombros ou mãos dele(a) por 2 minutos.", r: "🎁 Recompensa: Fechem os olhos e apenas sintam a presença um do outro." },
+            { fase: 3, turn: "O Coração", q: "O que posso fazer na próxima semana para nutrir ainda mais a nossa conexão?", r: "🎁 Recompensa: Um abraço final onde os dois relaxam o peso do corpo." }
+        ];
 
+        let idx = -1;
+        const music = document.getElementById('bg-music');
+        const card = document.getElementById('content-area');
+
+        function handleNext() {
+            if (idx === -1) {
+                music.play().catch(() => console.log("Áudio aguardando interação"));
+                document.getElementById('music-toggle').innerText = "🔊";
+            }
+
+            idx++;
+            if (idx < ritual.length) {
+                renderStep(ritual[idx]);
+            } else {
+                renderFinal();
+            }
+        }
+
+        function renderStep(step) {
+            card.classList.add('fade-out');
+            
             setTimeout(() => {
-                // Atualiza conteúdo
-                text.innerText = data.txt;
-                reward.innerText = data.rew;
-                turn.innerText = data.turn;
-                
-                // Atualiza Fase/Cores
-                if(data.fase === 1) body.style.background = "var(--bg-fase1)";
-                if(data.fase === 2) body.style.background = "var(--bg-fase2)";
-                if(data.fase === 3) body.style.background = "var(--bg-fase3)";
+                // Atualiza Textos
+                document.getElementById('turn-label').innerText = step.turn;
+                document.getElementById('main-text').innerText = step.q;
+                document.getElementById('reward-area').innerHTML = `<span class="reward-tag">${step.r}</span>`;
+                document.getElementById('next-btn').innerText = "Próximo Passo";
+                document.getElementById('step-label').innerText = `Etapa ${idx + 1} de ${ritual.length}`;
 
-                // Barra de progresso
-                progress.style.width = ((current + 1) / steps.length * 100) + "%";
+                // Atualiza Cores conforme Fase
+                const body = document.body;
+                if(step.fase === 1) body.style.background = "var(--fase1)";
+                if(step.fase === 2) body.style.background = "var(--fase2)";
+                if(step.fase === 3) body.style.background = "var(--fase3)";
 
-                // Animação de entrada
-                text.style.opacity = 1;
-                reward.classList.add('visible');
-                btn.innerText = "Próximo Passo";
-            }, 400);
+                // Atualiza Dots
+                updateDots();
 
-        } else {
-            finishGame();
+                card.classList.remove('fade-out');
+                card.classList.add('fade-in');
+            }, 500);
         }
-    }
 
-    function finishGame() {
-        document.getElementById('game-content').innerHTML = `
-            <h1>Sintonizados ❤️</h1>
-            <p>O jogo acabou, mas a conexão continua. <br> Que este momento seja o início de uma semana mais leve entre nós.</p>
-            <button onclick="location.reload()">Recomeçar</button>
-        `;
-        document.getElementById('progress').style.width = "100%";
-    }
-
-    function toggleMusic() {
-        if (music.paused) {
-            music.play();
-            document.getElementById('musicStatus').innerText = "ON";
-        } else {
-            music.pause();
-            document.getElementById('musicStatus').innerText = "OFF";
+        function updateDots() {
+            let dotsHtml = '';
+            for(let i=0; i<ritual.length; i++) {
+                dotsHtml += `<div class="dot ${i === idx ? 'active' : ''}"></div>`;
+            }
+            document.getElementById('dots').innerHTML = dotsHtml;
         }
-    }
-</script>
+
+        function renderFinal() {
+            card.classList.add('fade-out');
+            setTimeout(() => {
+                document.getElementById('turn-label').innerText = "Conexão Estabelecida";
+                document.getElementById('main-text').innerHTML = `
+                    <span style="font-family:'Playfair Display'; font-size: 1.5rem;">Sintonizados.</span><br><br>
+                    O jogo termina aqui, mas a nossa frequência continua. Que este momento de presença se estenda por todos os nossos dias. ❤️
+                `;
+                document.getElementById('reward-area').innerHTML = "";
+                document.getElementById('next-btn').style.display = "none";
+                document.getElementById('step-label').innerText = "Feito com amor";
+                card.classList.remove('fade-out');
+                card.classList.add('fade-in');
+            }, 500);
+        }
+
+        function toggleMusic() {
+            if (music.paused) {
+                music.play();
+                document.getElementById('music-toggle').innerText = "🔊";
+            } else {
+                music.pause();
+                document.getElementById('music-toggle').innerText = "🔇";
+            }
+        }
+    </script>
 </body>
 </html>
