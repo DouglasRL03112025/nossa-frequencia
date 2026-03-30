@@ -1,112 +1,240 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jogo: Nossa Frequência 🎲</title>
+    <title>Nossa Frequência | Experiência a Dois</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600&family=Inter:wght@300;500;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --bg-fase1: linear-gradient(135deg, #1e3a2f 0%, #0d1a14 100%);
+            --bg-fase2: linear-gradient(135deg, #3a2f1e 0%, #1a140d 100%);
+            --bg-fase3: linear-gradient(135deg, #3a1e1e 0%, #1a0d0d 100%);
+            --accent: #ff4081;
+            --glass: rgba(255, 255, 255, 0.07);
+        }
+
+        * { box-sizing: border-box; transition: all 0.8s ease; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #1a1a1a;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-fase1);
             color: white;
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            text-align: center;
+            overflow: hidden;
         }
-        #game-container {
-            background-color: #2d2d2d;
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            max-width: 400px;
-            width: 90%;
-            transition: all 0.5s ease;
-        }
-        .fase-1 { border: 4px solid #4caf50; } /* Verde */
-        .fase-2 { border: 4px solid #ffeb3b; } /* Amarelo */
-        .fase-3 { border: 4px solid #f44336; } /* Vermelho */
 
-        h1 { font-size: 1.5rem; margin-bottom: 10px; }
-        p { font-size: 1.1rem; line-height: 1.5; min-height: 80px; }
-        .reward { color: #ffab40; font-weight: bold; margin-top: 15px; font-style: italic; }
-        
+        /* Container Principal com Efeito Glassmorphism */
+        #app-container {
+            width: 90%;
+            max-width: 450px;
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        h1 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+            color: var(--accent);
+        }
+
+        .turn-indicator {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            color: #aaa;
+            font-weight: 700;
+        }
+
+        #text {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            margin: 20px 0;
+            min-height: 120px;
+            font-weight: 300;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reward-box {
+            background: rgba(255, 64, 129, 0.15);
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent);
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .reward-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
         button {
-            background-color: #ff4081;
-            color: white;
+            background: white;
+            color: #1a1a1a;
             border: none;
-            padding: 15px 30px;
+            padding: 16px 40px;
             font-size: 1rem;
+            font-weight: 700;
             border-radius: 50px;
             cursor: pointer;
-            margin-top: 20px;
-            transition: transform 0.2s;
+            margin-top: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
         }
-        button:active { transform: scale(0.95); }
-        .step-info { font-size: 0.8rem; color: #aaa; margin-top: 20px; }
+
+        button:hover {
+            transform: scale(1.05);
+            background: var(--accent);
+            color: white;
+        }
+
+        .progress-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: var(--accent);
+            width: 0%;
+            border-radius: 0 0 0 30px;
+        }
+
+        /* Áudio Control */
+        #audio-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            cursor: pointer;
+            opacity: 0.5;
+        }
     </style>
 </head>
 <body>
 
-<div id="game-container" class="fase-1">
-    <div id="content">
-        <h1>🎲 Nossa Frequência</h1>
-        <p id="text">Bem-vindos! Deixem os telemóveis de lado. O objetivo hoje é sintonizar um no outro. <br><br> Prontos?</p>
-        <div id="reward" class="reward"></div>
-        <button onclick="proximoPasso()">Começar Jogo</button>
-        <div id="step-count" class="step-info">Prepara os doces! 🍬</div>
+    <audio id="bgMusic" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2021/04/Rain-and-Flowers-chosic.com_.mp3" type="audio/mpeg">
+    </audio>
+
+    <div id="app-container">
+        <div id="game-content">
+            <div class="turn-indicator" id="turn">Sincronização</div>
+            <h1 id="title">Nossa Frequência</h1>
+            <p id="text">Este é um espaço seguro para nós dois. <br> Esqueçam o mundo lá fora por 25 minutos. <br><br> Vamos começar?</p>
+            
+            <div id="reward" class="reward-box">
+                </div>
+
+            <button id="mainBtn" onclick="nextStep()">Iniciar Ritual</button>
+        </div>
+        <div class="progress-bar" id="progress"></div>
     </div>
-</div>
+
+    <div id="audio-controls" onclick="toggleMusic()">
+        🎵 <span id="musicStatus">OFF</span>
+    </div>
 
 <script>
-    const jogo = [
-        // FASE 1
-        { fase: 1, txt: "Qual foi o primeiro 'mico' ou coisa engraçada que aconteceu no início do nosso namoro?", rew: "🎁 Recompensa: Quem responde ganha 1 doce!" },
-        { fase: 1, txt: "Se pudéssemos repetir um único encontro que tivemos, qual seria?", rew: "🎁 Recompensa: 1 doce para quem respondeu!" },
-        { fase: 1, txt: "Qual mania minha que, apesar de irritante, você acha que 'faz parte do pacote'?", rew: "🎁 Recompensa: 1 doce!" },
+    const steps = [
+        { fase: 1, turn: "Vez Dele", txt: "Qual foi o primeiro 'mico' ou coisa engraçada que aconteceu no início do nosso namoro?", rew: "🎁 Recompensa: Você ganhou um doce! Saboreie lentamente." },
+        { fase: 1, turn: "Vez Dela", txt: "Se pudéssemos repetir um único encontro que tivemos, qual seria e por quê?", rew: "🎁 Recompensa: Ganhaste um doce! Escolha o preferido dele(a) para ele(a) comer." },
+        { fase: 1, turn: "Os Dois", txt: "Qual mania minha que, apesar de irritante, você hoje acha que é 'a minha cara'?", rew: "🎁 Recompensa: Um sorriso sincero e um doce compartilhado." },
         
-        // FASE 2
-        { fase: 2, txt: "Qual característica minha você admira e que eu raramente recebo elogios por ela?", rew: "🎁 Recompensa: Um abraço de 20 segundos (Liberta ocitocina!)." },
-        { fase: 2, txt: "Olhem-se nos olhos por 30 segundos em silêncio antes da próxima pergunta...", rew: "🎁 Recompensa: Carinho no rosto um do outro." },
-        { fase: 2, txt: "Qual momento desta última semana fez você se sentir amado(a) ou cuidado(a) por mim?", rew: "🎁 Recompensa: Um beijo na testa ou na mão." },
+        { fase: 2, turn: "Vez Dele", txt: "Qual característica minha você admira e sente que eu raramente sou elogiado(a) por ela?", rew: "🎁 Recompensa: Um abraço apertado de 20 segundos agora." },
+        { fase: 2, turn: "Os Dois", txt: "Fiquem em silêncio, olhando nos olhos um do outro por 30 segundos...", rew: "🎁 Recompensa: Façam carinho no rosto um do outro enquanto respiram fundo." },
+        { fase: 2, turn: "Vez Dela", txt: "Qual momento desta última semana fez você se sentir verdadeiramente amada por mim?", rew: "🎁 Recompensa: Um beijo carinhoso na testa ou na mão." },
         
-        // FASE 3
-        { fase: 3, txt: "Sussurre no ouvido do seu cônjuge algo que quer fazer com ele(a) no próximo fim de semana.", rew: "🎁 Recompensa: Um beijo de verdade (sem pressa)." },
-        { fase: 3, txt: "Faça uma massagem rápida nos ombros ou pés do outro por 2 minutos.", rew: "🎁 Recompensa: Relaxem o peso do corpo um no outro." },
-        { fase: 3, txt: "O que eu posso fazer na próxima semana para que você se sinta mais amado(a) e menos sobrecarregado(a)?", rew: "🎁 Recompensa: Um abraço bem longo e apertado." }
+        { fase: 3, turn: "Vez Dele", txt: "Sussurre no ouvido dela algo que você quer muito fazer com ela no próximo fim de semana.", rew: "🎁 Recompensa: Um beijo de verdade, sem pressa de acabar." },
+        { fase: 3, turn: "Vez Dela", txt: "Faça uma massagem relaxante nos ombros ou pés dele por 2 minutos.", rew: "🎁 Recompensa: Deixe o peso do seu corpo relaxar no dele." },
+        { fase: 3, turn: "Os Dois", txt: "O que eu posso fazer na próxima semana para que você se sinta mais amado(a) e menos sobrecarregado(a)?", rew: "🎁 Recompensa: Um abraço final onde os corações se encostam." }
     ];
 
-    let indice = -1;
+    let current = -1;
+    const music = document.getElementById('bgMusic');
 
-    function proximoPasso() {
-        indice++;
-        const container = document.getElementById('game-container');
-        const textElement = document.getElementById('text');
-        const rewardElement = document.getElementById('reward');
-        const stepElement = document.getElementById('step-count');
-        const btn = document.querySelector('button');
+    function nextStep() {
+        if (current === -1) {
+            music.play();
+            document.getElementById('musicStatus').innerText = "ON";
+        }
 
-        if (indice < jogo.length) {
-            const etapa = jogo[indice];
+        current++;
+        const btn = document.getElementById('mainBtn');
+        const text = document.getElementById('text');
+        const reward = document.getElementById('reward');
+        const turn = document.getElementById('turn');
+        const progress = document.getElementById('progress');
+        const body = document.body;
+
+        if (current < steps.length) {
+            const data = steps[current];
             
-            // Atualiza Texto e Recompensa
-            textElement.innerText = etapa.txt;
-            rewardElement.innerText = etapa.rew;
-            stepElement.innerText = `Etapa ${indice + 1} de ${jogo.length}`;
-            btn.innerText = "Próxima Pergunta";
+            // Animação de saída
+            text.style.opacity = 0;
+            reward.classList.remove('visible');
 
-            // Atualiza Cores conforme a Fase
-            container.className = `fase-${etapa.fase}`;
+            setTimeout(() => {
+                // Atualiza conteúdo
+                text.innerText = data.txt;
+                reward.innerText = data.rew;
+                turn.innerText = data.turn;
+                
+                // Atualiza Fase/Cores
+                if(data.fase === 1) body.style.background = "var(--bg-fase1)";
+                if(data.fase === 2) body.style.background = "var(--bg-fase2)";
+                if(data.fase === 3) body.style.background = "var(--bg-fase3)";
+
+                // Barra de progresso
+                progress.style.width = ((current + 1) / steps.length * 100) + "%";
+
+                // Animação de entrada
+                text.style.opacity = 1;
+                reward.classList.add('visible');
+                btn.innerText = "Próximo Passo";
+            }, 400);
+
         } else {
-            textElement.innerHTML = "<strong>Jogo Concluído!</strong><br>Aproveitem este momento de conexão. ❤️";
-            rewardElement.innerText = "";
-            stepElement.innerText = "Sintonizados com sucesso.";
-            btn.style.display = "none";
+            finishGame();
+        }
+    }
+
+    function finishGame() {
+        document.getElementById('game-content').innerHTML = `
+            <h1>Sintonizados ❤️</h1>
+            <p>O jogo acabou, mas a conexão continua. <br> Que este momento seja o início de uma semana mais leve entre nós.</p>
+            <button onclick="location.reload()">Recomeçar</button>
+        `;
+        document.getElementById('progress').style.width = "100%";
+    }
+
+    function toggleMusic() {
+        if (music.paused) {
+            music.play();
+            document.getElementById('musicStatus').innerText = "ON";
+        } else {
+            music.pause();
+            document.getElementById('musicStatus').innerText = "OFF";
         }
     }
 </script>
-
 </body>
 </html>
